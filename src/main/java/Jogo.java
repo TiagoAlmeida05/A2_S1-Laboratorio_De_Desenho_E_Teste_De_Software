@@ -8,7 +8,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
 public class Jogo {
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException{
         try{
             DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
             Screen screen = new TerminalScreen(terminalFactory.createTerminal());
