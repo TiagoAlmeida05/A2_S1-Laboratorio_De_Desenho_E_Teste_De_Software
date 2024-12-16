@@ -23,7 +23,8 @@ public class Menu {
     }
 
     public void start() throws IOException {
-        Screen screen = new DefaultTerminalFactory().createScreen();
+        DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Custom size
+        Screen screen = terminalFactory.createScreen();
         screen.startScreen();
         screen.setCursorPosition(null);
         screen.clear();
@@ -65,6 +66,10 @@ public class Menu {
         graphics.setBackgroundColor(TextColor.ANSI.BLUE);
         screen.clear();
 
+        String title = "Jumping Jack";
+        graphics.setForegroundColor(TextColor.ANSI.WHITE);
+        graphics.putString((screen.getTerminalSize().getColumns() - title.length()) / 2, 2, title);
+
         for (int i = 0; i < Menu_options.length; i++) {
             int y = 5 + i * 3;
 
@@ -72,6 +77,7 @@ public class Menu {
                 graphics.setBackgroundColor(TextColor.ANSI.MAGENTA);
                 graphics.putString(10, y, "> " + Menu_options[i]);
             }else{
+                graphics.setBackgroundColor(TextColor.ANSI.BLUE);
                 graphics.setForegroundColor(TextColor.ANSI.WHITE);
                 graphics.putString(15, y," " + Menu_options[i]);
             }
@@ -104,7 +110,7 @@ public class Menu {
 
     private void startGame() {
         try {
-            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
+            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Same size as the menu
             Screen screen = terminalFactory.createScreen();
             screen.startScreen();
             TerminalSize terminalSize = screen.getTerminalSize();
@@ -121,50 +127,63 @@ public class Menu {
     }
 
     private void chooseLevel() throws IOException {
-        Screen screen = new DefaultTerminalFactory().createScreen();
+        // Create a screen with the same size as the game and menu screens
+        DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Custom size like game screen
+        Screen screen = terminalFactory.createScreen();
         screen.startScreen();
-        screen.setCursorPosition(null);
+        screen.setCursorPosition(null);  // Hide cursor
         screen.clear();
-        String[] levels = {"Level 1"};
+
+        String[] levels = {"Level 1", "Level 2", "Level 3"};  // You can add more levels if needed
         boolean choosingLevel = true;
-        while(choosingLevel){
-            screen.clear();
+        int maxColumns = screen.getTerminalSize().getColumns();
+        int maxRows = screen.getTerminalSize().getRows();
+
+        // Adjust the y-position to be more centered or adjusted based on screen size
+        while (choosingLevel) {
+            screen.clear();  // Clear the screen at the beginning of each loop
             TextGraphics graphics = screen.newTextGraphics();
             graphics.setForegroundColor(TextColor.ANSI.WHITE);
 
-            for(int i = 0; i< levels.length; i++){
-                int y = 5 + i * 3;
-                if(i == selectedLevel){
+            // Calculate vertical starting point to center the levels
+            int startingY = maxRows / 4; // Start a little higher on the screen for more space
+            int optionHeight = 3;  // Vertical spacing between level options
+            for (int i = 0; i < levels.length; i++) {
+                int y = startingY + i * optionHeight;
+                if (i == selectedLevel) {
                     graphics.setBackgroundColor(TextColor.ANSI.MAGENTA);
-                    graphics.putString(10, y, "> " + levels[i]);
-                }else{
+                    graphics.putString(maxColumns / 4, y, "> " + levels[i]);
+                } else {
+                    graphics.setBackgroundColor(TextColor.ANSI.BLUE);
                     graphics.setForegroundColor(TextColor.ANSI.WHITE);
-                    graphics.putString(10, y, " " + levels[i]);
+                    graphics.putString(maxColumns / 4, y, " " + levels[i]);
                 }
             }
+
+            // Refresh the screen to update the changes
             screen.refresh();
 
+            // Read the key input to navigate and choose the level
             KeyStroke keyStroke = screen.readInput();
-
-            if(keyStroke != null){
-                switch(keyStroke.getKeyType()){
+            if (keyStroke != null) {
+                switch (keyStroke.getKeyType()) {
                     case ArrowUp:
-                        if(selectedLevel > 0){
-                            selectedLevel --;
+                        if (selectedLevel > 0) {
+                            selectedLevel--;
                         }
                         break;
                     case ArrowDown:
-                        if(selectedLevel < levels.length -1){
+                        if (selectedLevel < levels.length - 1) {
                             selectedLevel++;
                         }
                         break;
                     case Enter:
-                        choosingLevel = false;
-                        startGame();
-                        screen.stopScreen();
+                        choosingLevel = false;  // Exit the loop when a level is selected
+                        startGame();  // Start the game with the selected level
+                        screen.stopScreen();  // Stop the screen once done
                         break;
                     case Escape:
-                        choosingLevel = false;
+                        choosingLevel = false;  // Exit the loop if Escape is pressed
                         screen.stopScreen();
                         break;
                 }

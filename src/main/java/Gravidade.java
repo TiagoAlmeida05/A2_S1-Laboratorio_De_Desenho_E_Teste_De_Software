@@ -1,7 +1,7 @@
 public class Gravidade {
     private double verticalVelocity = 0;
-    private final double gravity = 0.05;
-    private final double jumpStrength = -1.2;
+    private final double gravity = 0.1;
+    private final double jumpStrength = -1.5;
     private final int groundLevel;
 
     public Gravidade(int groundLevel){
@@ -10,15 +10,17 @@ public class Gravidade {
 
     public void updatePosition(Personagem player) {
         verticalVelocity += gravity;
+        int spriteHeight = player.getSpriteHeight();
         int newY = player.getY() + (int) verticalVelocity;
-        if(newY >= groundLevel -1){
-            newY = groundLevel -1;
+        if(newY >= groundLevel - spriteHeight){
+            newY = groundLevel - spriteHeight;
             verticalVelocity = 0;
         }
         player.setY(newY);
     }
     public void jump(Personagem player){
-        if(player.getY() >= groundLevel -1){
+        int spriteHeight = player.getSpriteHeight();
+        if(player.getY() >= groundLevel - spriteHeight){
             verticalVelocity = jumpStrength;
         }
     }

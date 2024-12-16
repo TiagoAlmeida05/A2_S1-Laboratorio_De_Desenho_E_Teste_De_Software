@@ -1,0 +1,33 @@
+import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
+
+public class DoorSprite {
+    private final TextCharacter[][] sprite;
+
+    public DoorSprite() {
+        // Door sprite representation
+        sprite = new TextCharacter[][]{
+                {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) },
+
+                {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter('D', TextColor.ANSI.YELLOW, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) },
+
+                {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) }
+        };
+    }
+
+    public TextCharacter[][] getSprite() {
+        return sprite;
+    }
+}
