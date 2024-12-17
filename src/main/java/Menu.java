@@ -110,13 +110,21 @@ public class Menu {
 
     private void startGame() {
         try {
-            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Same size as the menu
+            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));
             Screen screen = terminalFactory.createScreen();
             screen.startScreen();
             TerminalSize terminalSize = screen.getTerminalSize();
-            Jogo jogo = new Jogo(screen, terminalSize.getColumns(), terminalSize.getRows());
-            jogo.startGame(screen, terminalSize);
-            score = jogo.getScore();
+
+            if (selectedLevel == 0) {  // Level 1
+                Level1 level1 = new Level1(screen, terminalSize.getColumns(), terminalSize.getRows());
+                level1.startGame(screen, terminalSize);
+                score = level1.getScore();
+            } else if (selectedLevel == 1) {  // Level 2
+                Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
+                level2.startGame(screen, terminalSize);
+                score = level2.getScore();
+            }
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -127,14 +135,13 @@ public class Menu {
     }
 
     private void chooseLevel() throws IOException {
-        // Create a screen with the same size as the game and menu screens
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Custom size like game screen
         Screen screen = terminalFactory.createScreen();
         screen.startScreen();
         screen.setCursorPosition(null);  // Hide cursor
         screen.clear();
 
-        String[] levels = {"Level 1", "Level 2", "Level 3"};  // You can add more levels if needed
+        String[] levels = {"Level 1", "Level 2"};  // You can add more levels if needed
         boolean choosingLevel = true;
         int maxColumns = screen.getTerminalSize().getColumns();
         int maxRows = screen.getTerminalSize().getRows();

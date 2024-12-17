@@ -15,14 +15,19 @@ public class DoorSprite {
 
                 {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
                         new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
-                        new TextCharacter('D', TextColor.ANSI.YELLOW, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
                         new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
                         new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) },
 
                 {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
-                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
-                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
-                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) },
+                {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
+                        new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.BLACK),
                         new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK) }
         };
     }

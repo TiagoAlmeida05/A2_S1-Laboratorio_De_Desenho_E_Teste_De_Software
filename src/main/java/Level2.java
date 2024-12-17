@@ -1,19 +1,20 @@
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
 
-public class Jogo {
-    private Personagem player;
-    private Gravidade gravity;
+public class Level2 {
+    private final Personagem player;
+    private final Gravidade gravity;
     private int score = 0;
-    private int doorX;  // X coordinate for the door
-    private DoorSprite doorSprite;  // Door sprite
+    private final int doorX;  // X coordinate for the door
+    private final DoorSprite doorSprite;  // Door sprite
 
-    public Jogo(Screen screen, int terminalWidth, int terminalHeight) {
+    public Level2(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
@@ -51,15 +52,20 @@ public class Jogo {
             gravity.updatePosition(player);
 
             // Draw the door at the ground level (one row above the floor)
-            drawDoor(screen, terminalSize.getRows() - 4);  // Place the door one row above the floor
+            drawDoor(screen, terminalSize.getRows() - 5);  // Place the door one row above the floor
             // Draw the floor and player
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
+            drawInstructions(screen, terminalSize);
 
             // Check for door collision
             if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
                 isPlaying = false; // End the game when player touches the door
                 showScore(); // Show score when level is completed
+            }
+
+            if (player.getX() > 40 && player.getX() < 60 && player.getY() > terminalSize.getRows()-6) {
+                showFallMessage(screen, terminalSize);  // Restart the level
             }
 
             // Refresh the screen
@@ -80,7 +86,11 @@ public class Jogo {
 
     private void drawFloor(Screen screen, int width) {
         for (int i = 0; i < width; i++) {
-            screen.setCharacter(i, screen.getTerminalSize().getRows() - 1, new TextCharacter('#', TextColor.ANSI.WHITE, TextColor.ANSI.BLACK));
+            if(i > 40 && i < 60){
+                screen.setCharacter(i, screen.getTerminalSize().getRows() - 1, new TextCharacter(' ', TextColor.ANSI.WHITE, TextColor.ANSI.BLACK));
+            }else{
+                screen.setCharacter(i, screen.getTerminalSize().getRows() - 1, new TextCharacter('#', TextColor.ANSI.WHITE, TextColor.ANSI.BLACK));
+            }
         }
     }
 
@@ -90,5 +100,31 @@ public class Jogo {
 
     public int getScore() {
         return score;
+    }
+
+    private void drawInstructions(Screen screen, TerminalSize terminalSize) {
+        TextGraphics graphics = screen.newTextGraphics();
+        graphics.setForegroundColor(TextColor.ANSI.WHITE);
+
+        String[] instructions = {
+                "Usa a seta para cima para saltares"
+        };
+
+        int startY = terminalSize.getRows() - 30;  // Place near the bottom
+        for (int i = 0; i < instructions.length; i++) {
+            String line = instructions[i];
+            int x = (terminalSize.getColumns() - line.length()) / 2;
+            graphics.putString(x, startY + i, line);
+        }
+    }
+    private void showFallMessage(Screen screen, TerminalSize terminalSize) throws IOException, InterruptedException {
+        screen.clear();
+        TextGraphics graphics = screen.newTextGraphics();
+        graphics.setForegroundColor(TextColor.ANSI.RED);
+        graphics.putString(terminalSize.getColumns() / 2 - 5, terminalSize.getRows() / 2, "You Fell!");
+        screen.refresh();
+        Thread.sleep(2000);
+        Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
+        level2.startGame(screen, terminalSize);
     }
 }

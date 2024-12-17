@@ -4,7 +4,7 @@ import com.googlecode.lanterna.screen.Screen;
 public class Personagem {
     private int x, y;
     private final TextCharacter[][] sprite;
-    private double velocityX = 0;
+    private int velocityX = 0;
 
     public Personagem(int startX, int startY, TextCharacter[][] sprite){
         this.x = startX;
