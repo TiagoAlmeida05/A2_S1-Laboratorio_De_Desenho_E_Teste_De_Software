@@ -1,42 +1,57 @@
-
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import java.io.IOException;
 
 public class Jogo {
-    public static void main(String[] args) throws InterruptedException{
-        try{
-            DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
-            Screen screen = new TerminalScreen(terminalFactory.createTerminal());
-            screen.startScreen();
+    private Personagem player;
+    private Gravidade gravity;
+    private int score = 0;
 
-            TerminalSize terminalSize = screen.getTerminalSize();
-            Personagem player = new Personagem(terminalSize.getColumns()/2, terminalSize.getRows()/2,'@' );
+    public Jogo(Screen screen, int terminalWidth, int terminalHeight){
+        int groundLevel = terminalHeight -1;
+        player = new Personagem(terminalWidth/2, groundLevel -1, '@', TextColor.ANSI.MAGENTA);
+        gravity = new Gravidade(groundLevel);
+    }
+    public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
+        boolean isPlaying = true;
 
-            boolean running = true;
-            while(running){
-                screen.clear();
-                player.draw(screen);
-                screen.refresh();
-                KeyStroke keyStroke = screen.pollInput();
-                if(keyStroke != null){
-                    switch(keyStroke.getKeyType()){
-                        case ArrowUp -> player.move(0,-1,terminalSize);
-                        case ArrowDown -> player.move(0,1,terminalSize);
-                        case ArrowLeft -> player.move(-1,0,terminalSize);
-                        case ArrowRight -> player.move(1,0,terminalSize);
-                        case Escape, Character -> running = false;
+        while (isPlaying){
+            screen.clear();
+
+            KeyStroke keyStroke = screen.pollInput();
+            if(keyStroke != null){
+                if(keyStroke.getCharacter()!= null){
+                    char key = keyStroke.getCharacter();
+                    switch(key){
+                        case 'w' -> gravity.jump(player);
+                        case 'a' -> player.moveLeft();
+                        case 'd' -> player.moveRight();
+                        case 'q' -> isPlaying = false;
                     }
+                }else if(keyStroke.getKeyType() == KeyType.Escape){
+                    screen.stopScreen();
+                    System.exit(0);
                 }
-                Thread.sleep(25);
             }
-            screen.startScreen();
-        } catch (Exception e) {
-            e.printStackTrace();
+            if(keyStroke == null){
+                player.stopMovement();
+            }
+            player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
+            gravity.updatePosition(player);
+            player.draw(screen);
+            score++;
+            screen.refresh();
+            Thread.sleep(10);
         }
+        showScore();
+    }
+    private  void showScore(){
+        System.out.println("Your final score is: " + score + " coins!");
+    }
+    public int getScore(){
+        return score;
     }
 }
