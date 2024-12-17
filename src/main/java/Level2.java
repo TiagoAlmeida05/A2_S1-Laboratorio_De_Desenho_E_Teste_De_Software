@@ -9,20 +9,21 @@ import java.io.IOException;
 
 public class Level2 {
     private final Personagem player;
-    private final Gravidade gravity;
+    private final PlatformPhysics platformPhysics;
     private int score = 0;
-    private final int doorX;  // X coordinate for the door
-    private final DoorSprite doorSprite;  // Door sprite
+    private final int doorX;
+    private final DoorSprite doorSprite;
+    private static final int PLATFORM_Y = 45;
+    private static final int PLATFORM_START_X = 35;
+    private static final int PLATFORM_END_X = 65;
 
     public Level2(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
-        gravity = new Gravidade(groundLevel);
-
-        // Create a door sprite and place the door at a specific x coordinate
         doorSprite = new DoorSprite();
-        doorX = terminalWidth - 6;  // Position the door near the end of the level
+        doorX = terminalWidth - 6;
+        platformPhysics = new PlatformPhysics(groundLevel, PLATFORM_Y, PLATFORM_START_X,PLATFORM_END_X);
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
@@ -35,7 +36,7 @@ public class Level2 {
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
                     switch (keyStroke.getKeyType()) {
-                        case ArrowUp -> gravity.jump(player);
+                        case ArrowUp -> platformPhysics.jump(player);
                         case ArrowLeft -> player.moveLeft();
                         case ArrowRight -> player.moveRight();
                         case Escape -> System.exit(0);
@@ -47,28 +48,25 @@ public class Level2 {
                 player.stopMovement();
             }
 
-            // Update player position and gravity
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
-            gravity.updatePosition(player);
+            platformPhysics.updatePosition(player);
 
-            // Draw the door at the ground level (one row above the floor)
-            drawDoor(screen, terminalSize.getRows() - 5);  // Place the door one row above the floor
-            // Draw the floor and player
+            drawDoor(screen, terminalSize.getRows() - 5);
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
             drawInstructions(screen, terminalSize);
+            drawPlatform(screen);
 
             // Check for door collision
             if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
-                isPlaying = false; // End the game when player touches the door
-                showScore(); // Show score when level is completed
+                isPlaying = false;
+                showScore();
             }
 
             if (player.getX() > 40 && player.getX() < 60 && player.getY() > terminalSize.getRows()-6) {
-                showFallMessage(screen, terminalSize);  // Restart the level
+                showFallMessage(screen, terminalSize);
             }
 
-            // Refresh the screen
             screen.refresh();
             score++;
             Thread.sleep(10);
@@ -76,7 +74,7 @@ public class Level2 {
     }
 
     private void drawDoor(Screen screen, int doorY) {
-        // Draw the door sprite at the doorX position and at the ground level (one row higher than the floor)
+
         for (int y = 0; y < doorSprite.getSprite().length; y++) {
             for (int x = 0; x < doorSprite.getSprite()[y].length; x++) {
                 screen.setCharacter(doorX + x, doorY + y, doorSprite.getSprite()[y][x]);
@@ -110,7 +108,7 @@ public class Level2 {
                 "Usa a seta para cima para saltares"
         };
 
-        int startY = terminalSize.getRows() - 30;  // Place near the bottom
+        int startY = terminalSize.getRows() - 30;
         for (int i = 0; i < instructions.length; i++) {
             String line = instructions[i];
             int x = (terminalSize.getColumns() - line.length()) / 2;
@@ -126,5 +124,15 @@ public class Level2 {
         Thread.sleep(2000);
         Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
         level2.startGame(screen, terminalSize);
+    }
+
+    private void drawPlatform(Screen screen) {
+        TextGraphics graphics = screen.newTextGraphics();
+
+        // Draw the platform at the defined position
+        for (int i = PLATFORM_START_X; i <= PLATFORM_END_X; i++) {
+            graphics.setForegroundColor(TextColor.ANSI.GREEN);
+            graphics.putString(i, PLATFORM_Y, "#");
+        }
     }
 }

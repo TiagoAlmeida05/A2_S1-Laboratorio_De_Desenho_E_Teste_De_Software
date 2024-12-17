@@ -8,9 +8,8 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.io.IOException;
 
 public class Menu {
-    private static final String[] Menu_options = {"PLAY", "SCORE", "LEVELS"};
+    private static final String[] Menu_options = {"PLAY", "LEVELS", "EXIT"};
     private int selectedOption = -1;
-    private int score = 0;
     private int selectedLevel = 0;
 
     public static void main(String[] args) {
@@ -98,11 +97,11 @@ public class Menu {
             case "PLAY":
                 startGame();
                 break;
-            case "SCORE":
-                showScore();
-                break;
             case "LEVELS":
                 chooseLevel();
+                break;
+            case "EXIT":
+                System.exit(0);
                 break;
         }
         return false;
@@ -118,11 +117,9 @@ public class Menu {
             if (selectedLevel == 0) {  // Level 1
                 Level1 level1 = new Level1(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level1.startGame(screen, terminalSize);
-                score = level1.getScore();
             } else if (selectedLevel == 1) {  // Level 2
                 Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level2.startGame(screen, terminalSize);
-                score = level2.getScore();
             }
 
         } catch (IOException | InterruptedException e) {
@@ -130,31 +127,26 @@ public class Menu {
         }
     }
 
-    private void showScore() {
-        System.out.println(" Your score is: " + score + " coins.");
-    }
-
     private void chooseLevel() throws IOException {
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(new TerminalSize(100, 50));  // Custom size like game screen
         Screen screen = terminalFactory.createScreen();
         screen.startScreen();
-        screen.setCursorPosition(null);  // Hide cursor
+        screen.setCursorPosition(null);
         screen.clear();
 
-        String[] levels = {"Level 1", "Level 2"};  // You can add more levels if needed
+        String[] levels = {"Level 1", "Level 2"};
         boolean choosingLevel = true;
         int maxColumns = screen.getTerminalSize().getColumns();
         int maxRows = screen.getTerminalSize().getRows();
 
-        // Adjust the y-position to be more centered or adjusted based on screen size
+
         while (choosingLevel) {
-            screen.clear();  // Clear the screen at the beginning of each loop
+            screen.clear();
             TextGraphics graphics = screen.newTextGraphics();
             graphics.setForegroundColor(TextColor.ANSI.WHITE);
 
-            // Calculate vertical starting point to center the levels
-            int startingY = maxRows / 4; // Start a little higher on the screen for more space
-            int optionHeight = 3;  // Vertical spacing between level options
+            int startingY = maxRows / 4;
+            int optionHeight = 3;
             for (int i = 0; i < levels.length; i++) {
                 int y = startingY + i * optionHeight;
                 if (i == selectedLevel) {
@@ -167,10 +159,8 @@ public class Menu {
                 }
             }
 
-            // Refresh the screen to update the changes
             screen.refresh();
 
-            // Read the key input to navigate and choose the level
             KeyStroke keyStroke = screen.readInput();
             if (keyStroke != null) {
                 switch (keyStroke.getKeyType()) {
@@ -185,21 +175,12 @@ public class Menu {
                         }
                         break;
                     case Enter:
-                        choosingLevel = false;  // Exit the loop when a level is selected
-                        startGame();  // Start the game with the selected level
-                        screen.stopScreen();  // Stop the screen once done
-                        break;
-                    case Escape:
-                        choosingLevel = false;  // Exit the loop if Escape is pressed
+                        choosingLevel = false;
+                        startGame();
                         screen.stopScreen();
                         break;
                 }
             }
         }
-    }
-
-
-    public void addScore (int coins){
-        this.score += coins;
     }
 }

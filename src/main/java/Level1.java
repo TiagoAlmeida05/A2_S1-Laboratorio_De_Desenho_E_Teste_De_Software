@@ -12,8 +12,8 @@ public class Level1 {
     private final Gravidade gravity;
     private int score = 0;
     private final int doorY;
-    private final int doorX;  // X coordinate for the door
-    private final DoorSprite doorSprite;  // Door sprite
+    private final int doorX;
+    private final DoorSprite doorSprite;
 
     public Level1(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
@@ -28,9 +28,8 @@ public class Level1 {
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
-        boolean isPlaying = true;
 
-        while (isPlaying) {
+        while (true) {
             screen.clear();
 
             KeyStroke keyStroke = screen.pollInput();
@@ -49,24 +48,19 @@ public class Level1 {
                 player.stopMovement();
             }
 
-            // Update player position and gravity
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
             gravity.updatePosition(player);
 
-            // Draw the door at the ground level (one row above the floor)
             drawDoor(screen, terminalSize.getRows() - 5);  // Place the door one row above the floor
-            // Draw the floor and player
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
             drawInstructions(screen, terminalSize);
 
-            // Check for door collision
             if (player.getX() >= doorX && player.getY() == doorY) {
-                startLevel2(screen, terminalSize);  // Switch to Level 2
-                return;  // End the current level
+                startLevel2(screen, terminalSize);
+                return;
             }
 
-            // Refresh the screen
             screen.refresh();
             score++;
             Thread.sleep(10);
@@ -74,7 +68,6 @@ public class Level1 {
     }
 
     private void drawDoor(Screen screen, int doorY) {
-        // Draw the door sprite at the doorX position and at the ground level (one row higher than the floor)
         for (int y = 0; y < doorSprite.getSprite().length; y++) {
             for (int x = 0; x < doorSprite.getSprite()[y].length; x++) {
                 screen.setCharacter(doorX + x, doorY + y, doorSprite.getSprite()[y][x]);
@@ -88,14 +81,6 @@ public class Level1 {
         }
     }
 
-    private void showScore() {
-        System.out.println("Your final score is: " + score + " coins!");
-    }
-
-    public int getScore() {
-        return score;
-    }
-
     private void drawInstructions(Screen screen, TerminalSize terminalSize) {
         TextGraphics graphics = screen.newTextGraphics();
         graphics.setForegroundColor(TextColor.ANSI.WHITE);
@@ -106,7 +91,7 @@ public class Level1 {
                 "<- para te moveres para a esquerda"
         };
 
-        int startY = terminalSize.getRows() - 30;  // Place near the bottom
+        int startY = terminalSize.getRows() - 30;
         for (int i = 0; i < instructions.length; i++) {
             String line = instructions[i];
             int x = (terminalSize.getColumns() - line.length()) / 2;

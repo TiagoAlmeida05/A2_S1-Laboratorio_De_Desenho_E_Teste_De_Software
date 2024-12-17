@@ -5,7 +5,6 @@ public class DoorSprite {
     private final TextCharacter[][] sprite;
 
     public DoorSprite() {
-        // Door sprite representation
         sprite = new TextCharacter[][]{
                 {   new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
                         new TextCharacter('#', TextColor.ANSI.CYAN, TextColor.ANSI.BLACK),
