@@ -14,7 +14,6 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation group: 'com.googlecode.lanterna', name: 'lanterna', version: '3.1.2'
-
 }
 
 test {
@@ -22,5 +21,10 @@ test {
 }
 
 application {
-    mainClass.set("Jogo")
+    mainClass.set("Menu")
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
