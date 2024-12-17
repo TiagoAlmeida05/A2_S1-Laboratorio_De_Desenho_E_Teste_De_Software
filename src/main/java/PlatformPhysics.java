@@ -14,23 +14,26 @@ public class PlatformPhysics {
     public void updatePosition(Personagem player) {
         gravidade.updatePosition(player);
 
-        handlePlatformCollision(player);
-    }
-
-    private void handlePlatformCollision(Personagem player) {
-        int playerY = player.getY();
-        int playerX = player.getX();
-        int spriteHeight = player.getSpriteHeight();
-
-        if (playerX >= platformStartX && playerX <= platformEndX) {
-            if (playerY + spriteHeight >= platformY && playerY + spriteHeight <= platformY + 1) {
-                player.setY(platformY - spriteHeight);
-                gravidade.resetVerticalVelocity();
-            }
+        if (isOnPlatform(player)) {
+            gravidade.resetVerticalVelocity();
+            player.setY(platformY - player.getSpriteHeight());
         }
     }
 
+    private boolean isOnPlatform(Personagem player) {
+        boolean onPlatform = player.getY() == platformY - player.getSpriteHeight() &&
+                player.getX() >= platformStartX && player.getX() <= platformEndX;
+        return onPlatform;
+    }
+
+    private boolean isOnGround(Personagem player) {
+        boolean onGround = player.getY() == gravidade.getGroundLevel() - player.getSpriteHeight();
+        return onGround;
+    }
+
     public void jump(Personagem player) {
-        gravidade.jump(player);
+        if (isOnPlatform(player) || isOnGround(player)) {
+            gravidade.jump(player);
+        }
     }
 }

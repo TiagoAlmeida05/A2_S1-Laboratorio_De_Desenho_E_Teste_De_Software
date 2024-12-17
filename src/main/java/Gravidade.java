@@ -19,13 +19,13 @@ public class Gravidade {
         player.setY(newY);
     }
     public void jump(Personagem player){
-        int spriteHeight = player.getSpriteHeight();
-        if(player.getY() >= groundLevel - spriteHeight){
             verticalVelocity = jumpStrength;
-        }
 
     }
     public void resetVerticalVelocity(){
         verticalVelocity = 0;
+    }
+    public int getGroundLevel(){
+        return groundLevel;
     }
 }
