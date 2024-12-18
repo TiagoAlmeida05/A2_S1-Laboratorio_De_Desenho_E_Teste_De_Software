@@ -11,24 +11,24 @@ import java.util.List;
 
 public class Level4 {
     private final Personagem player;
-    private final PlatformPhysics platformPhysics;
     private int score = 0;
     private final int doorX;
     private final int doorY;
     private final DoorSprite doorSprite;
-    private static final int PLATFORM_Y = 45;
-    private static final int PLATFORM_START_X = 35;
-    private static final int PLATFORM_END_X = 65;
     private final List<Coin> coins;
+    private final List<Platform> platforms;
+    private final Gravidade gravidade;
 
     public Level4(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
+        gravidade = new Gravidade(groundLevel);
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
         doorSprite = new DoorSprite();
         doorX = terminalWidth - 6;
         doorY = terminalHeight -4;
-        platformPhysics = new PlatformPhysics(groundLevel, PLATFORM_Y, PLATFORM_START_X,PLATFORM_END_X);
+        platforms = new ArrayList<>();
+        platforms.add(new Platform(35, 65, 45));
         coins = new ArrayList<>();
         coins.add(new Coin(10, 48));
         coins.add(new Coin(27, 48));
@@ -44,7 +44,12 @@ public class Level4 {
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
                     switch (keyStroke.getKeyType()) {
-                        case ArrowUp -> platformPhysics.jump(player);
+                        case ArrowUp -> {
+                            if (player.getY() == terminalSize.getRows() - player.getSpriteHeight() - 1 ||
+                                    platforms.stream().anyMatch(platform -> platform.isPlayerOnPlatform(player))) {
+                                gravidade.jump();
+                            }
+                        }
                         case ArrowLeft -> player.moveLeft();
                         case ArrowRight -> player.moveRight();
                         case Escape -> System.exit(0);
@@ -57,14 +62,26 @@ public class Level4 {
             }
 
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
-            platformPhysics.updatePosition(player);
+            gravidade.updatePosition(player);
 
+            boolean onPlatform = false;
+            for (Platform platform : platforms) {
+                if (platform.isPlayerOnPlatform(player)) {
+                    gravidade.resetVerticalVelocity();
+                    player.setY(platform.getY() - player.getSpriteHeight());
+                    onPlatform = true;
+                }
+            }
+
+            if (!onPlatform && player.getY() >= terminalSize.getRows() - player.getSpriteHeight() - 1) {
+                player.setY(terminalSize.getRows() - player.getSpriteHeight() - 1);
+            }
             drawDoor(screen, terminalSize.getRows() - 5);
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
             drawInstructions(screen, terminalSize);
             drawSpikes(screen);
-            drawPlatform(screen);
+            drawPlatforms(screen);
 
             for(Coin coin:coins){
                 coin.draw(screen);
@@ -126,12 +143,15 @@ public class Level4 {
             graphics.putString(x, startY + i, line);
         }
     }
-    private void drawPlatform(Screen screen) {
+    private void drawPlatforms(Screen screen) {
         TextGraphics graphics = screen.newTextGraphics();
+        graphics.setForegroundColor(TextColor.ANSI.GREEN);
 
-        for (int i = PLATFORM_START_X; i <= PLATFORM_END_X; i++) {
-            graphics.setForegroundColor(TextColor.ANSI.GREEN);
-            graphics.putString(i, PLATFORM_Y, "#");
+        for (Platform platform : platforms) {
+            for (int x = platform.getStartX(); x <= platform.getEndX(); x++) {
+                screen.setCharacter(x, platform.getY(),
+                        new TextCharacter('#', TextColor.ANSI.GREEN, TextColor.ANSI.BLACK));
+            }
         }
     }
     private void showFallMessage(Screen screen, TerminalSize terminalSize) throws IOException, InterruptedException {

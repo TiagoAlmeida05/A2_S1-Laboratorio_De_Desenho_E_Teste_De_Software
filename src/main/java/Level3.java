@@ -6,17 +6,17 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Level3 {
     private final Personagem player;
-    private final PlatformPhysics platformPhysics;
+    private final Gravidade gravidade;
     private int score = 0;
     private final int doorX;
     private final int doorY;
     private final DoorSprite doorSprite;
-    private static final int PLATFORM_Y = 45;
-    private static final int PLATFORM_START_X = 35;
-    private static final int PLATFORM_END_X = 65;
+    private final List<Platform> platforms;
 
     public Level3(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
@@ -24,8 +24,10 @@ public class Level3 {
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
         doorSprite = new DoorSprite();
         doorX = terminalWidth - 6;
-        doorY = terminalHeight - 4;
-        platformPhysics = new PlatformPhysics(groundLevel, PLATFORM_Y, PLATFORM_START_X,PLATFORM_END_X);
+        doorY = terminalHeight -4;
+        gravidade = new Gravidade(groundLevel);
+        platforms = new ArrayList<>();
+        platforms.add(new Platform(35, 65, 45));
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
@@ -37,7 +39,12 @@ public class Level3 {
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
                     switch (keyStroke.getKeyType()) {
-                        case ArrowUp -> platformPhysics.jump(player);
+                        case ArrowUp -> {
+                            if (player.getY() == terminalSize.getRows() - player.getSpriteHeight() - 1 ||
+                                    platforms.stream().anyMatch(platform -> platform.isPlayerOnPlatform(player))) {
+                                gravidade.jump();
+                            }
+                        }
                         case ArrowLeft -> player.moveLeft();
                         case ArrowRight -> player.moveRight();
                         case Escape -> System.exit(0);
@@ -50,13 +57,26 @@ public class Level3 {
             }
 
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
-            platformPhysics.updatePosition(player);
+            gravidade.updatePosition(player);
+
+            boolean onPlatform = false;
+            for (Platform platform : platforms) {
+                if (platform.isPlayerOnPlatform(player)) {
+                    gravidade.resetVerticalVelocity();
+                    player.setY(platform.getY() - player.getSpriteHeight());
+                    onPlatform = true;
+                }
+            }
+
+            if (!onPlatform && player.getY() >= terminalSize.getRows() - player.getSpriteHeight() - 1) {
+                player.setY(terminalSize.getRows() - player.getSpriteHeight() - 1);
+            }
 
             drawDoor(screen, terminalSize.getRows() - 5);
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
             drawInstructions(screen, terminalSize);
-            drawPlatform(screen);
+            drawPlatforms(screen);
             drawSpikes(screen);
 
             if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
@@ -134,12 +154,15 @@ public class Level3 {
         level3.startGame(screen, terminalSize);
     }
 
-    private void drawPlatform(Screen screen) {
+    private void drawPlatforms(Screen screen) {
         TextGraphics graphics = screen.newTextGraphics();
+        graphics.setForegroundColor(TextColor.ANSI.GREEN);
 
-        for (int i = PLATFORM_START_X; i <= PLATFORM_END_X; i++) {
-            graphics.setForegroundColor(TextColor.ANSI.GREEN);
-            graphics.putString(i, PLATFORM_Y, "#");
+        for (Platform platform : platforms) {
+            for (int x = platform.getStartX(); x <= platform.getEndX(); x++) {
+                screen.setCharacter(x, platform.getY(),
+                        new TextCharacter('#', TextColor.ANSI.GREEN, TextColor.ANSI.BLACK));
+            }
         }
     }
     private void drawSpikes(Screen screen) {

@@ -13,6 +13,7 @@ public class Level5 {
     private final Personagem player;
     private int score = 0;
     private final int doorX;
+    private final int doorY;
     private final DoorSprite doorSprite;
     private final List<Coin> coins;
     private final List<Platform> platforms;
@@ -25,6 +26,7 @@ public class Level5 {
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
         doorSprite = new DoorSprite();
         doorX = terminalWidth - 6;
+        doorY = terminalHeight - 4;
         coins = new ArrayList<>();
         coins.add(new Coin(10, 48));
         coins.add(new Coin(27, 48));
