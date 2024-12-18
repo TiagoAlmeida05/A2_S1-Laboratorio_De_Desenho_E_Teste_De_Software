@@ -21,19 +21,18 @@ public class PlatformPhysics {
     }
 
     private boolean isOnPlatform(Personagem player) {
-        boolean onPlatform = player.getY() == platformY - player.getSpriteHeight() &&
+        return player.getY() == platformY - player.getSpriteHeight() &&
                 player.getX() >= platformStartX && player.getX() <= platformEndX;
-        return onPlatform;
     }
 
     private boolean isOnGround(Personagem player) {
-        boolean onGround = player.getY() == gravidade.getGroundLevel() - player.getSpriteHeight();
-        return onGround;
+        return player.getY() == gravidade.getGroundLevel() - player.getSpriteHeight();
     }
 
     public void jump(Personagem player) {
         if (isOnPlatform(player) || isOnGround(player)) {
-            gravidade.jump(player);
+            gravidade.jump();
         }
     }
+
 }

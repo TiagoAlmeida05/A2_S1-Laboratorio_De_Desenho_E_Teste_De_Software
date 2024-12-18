@@ -6,38 +6,49 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Level3 {
+public class Level5 {
     private final Personagem player;
-    private final PlatformPhysics platformPhysics;
     private int score = 0;
     private final int doorX;
-    private final int doorY;
     private final DoorSprite doorSprite;
-    private static final int PLATFORM_Y = 45;
-    private static final int PLATFORM_START_X = 35;
-    private static final int PLATFORM_END_X = 65;
+    private final List<Coin> coins;
+    private final List<Platform> platforms;
+    private final Gravidade gravidade;
 
-    public Level3(Screen screen, int terminalWidth, int terminalHeight) {
+    public Level5(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
+        gravidade = new Gravidade(groundLevel);
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
         doorSprite = new DoorSprite();
         doorX = terminalWidth - 6;
-        doorY = terminalHeight - 4;
-        platformPhysics = new PlatformPhysics(groundLevel, PLATFORM_Y, PLATFORM_START_X,PLATFORM_END_X);
+        coins = new ArrayList<>();
+        coins.add(new Coin(10, 48));
+        coins.add(new Coin(27, 48));
+        coins.add(new Coin(50, 44));
+        coins.add(new Coin(70, 39));
+        platforms = new ArrayList<>();
+        platforms.add(new Platform(35, 65, 45));
+        platforms.add(new Platform(60, 95, 40));
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
-        boolean isPlaying = true;
 
-        while (isPlaying) {
+        while (true) {
             screen.clear();
             KeyStroke keyStroke = screen.pollInput();
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
                     switch (keyStroke.getKeyType()) {
-                        case ArrowUp -> platformPhysics.jump(player);
+                        case ArrowUp -> {
+                            if (player.getY() == terminalSize.getRows() - player.getSpriteHeight() - 1 ||
+                                    platforms.stream().anyMatch(platform -> platform.isPlayerOnPlatform(player))) {
+                                gravidade.jump();
+                            }
+                        }
                         case ArrowLeft -> player.moveLeft();
                         case ArrowRight -> player.moveRight();
                         case Escape -> System.exit(0);
@@ -50,28 +61,46 @@ public class Level3 {
             }
 
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
-            platformPhysics.updatePosition(player);
+            gravidade.updatePosition(player);
+
+            boolean onPlatform = false;
+            for (Platform platform : platforms) {
+                if (platform.isPlayerOnPlatform(player)) {
+                    gravidade.resetVerticalVelocity();
+                    player.setY(platform.getY() - player.getSpriteHeight());
+                    onPlatform = true;
+                }
+            }
+
+            if (!onPlatform && player.getY() >= terminalSize.getRows() - player.getSpriteHeight() - 1) {
+                player.setY(terminalSize.getRows() - player.getSpriteHeight() - 1);
+            }
 
             drawDoor(screen, terminalSize.getRows() - 5);
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
-            drawInstructions(screen, terminalSize);
-            drawPlatform(screen);
             drawSpikes(screen);
+            drawPlatforms(screen);
 
-            if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
-                isPlaying = false;
-                showScore();
+            for(Coin coin:coins){
+                coin.draw(screen);
             }
-            if (player.getX() >= doorX && player.getY() == doorY) {
-                startLevel4(screen, terminalSize);
-                return;
-            }
+
+            collectCoins();
+
+
+//            if (player.getX() >= doorX && player.getY() == doorY) {
+//                startLevel4(screen, terminalSize);
+//                return;
+//            }
 
             if (player.getX() > 40 && player.getX() < 60 && player.getY() > terminalSize.getRows()-6) {
                 showFallMessage(screen, terminalSize);
             }
             if (player.getX()+3 > 20 && player.getX()-1 < 23 && player.getY() > terminalSize.getRows()-6) {
+                showFallMessage(screen, terminalSize);
+            }
+            if (player.getX()+3 > 60 && player.getX()-1 < 93 && player.getY() > terminalSize.getRows()-6) {
                 showFallMessage(screen, terminalSize);
             }
 
@@ -100,27 +129,15 @@ public class Level3 {
         }
     }
 
-    private void showScore() {
-        System.out.println("Your final score is: " + score + " coins!");
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    private void drawInstructions(Screen screen, TerminalSize terminalSize) {
+    private void drawPlatforms(Screen screen) {
         TextGraphics graphics = screen.newTextGraphics();
-        graphics.setForegroundColor(TextColor.ANSI.WHITE);
+        graphics.setForegroundColor(TextColor.ANSI.GREEN);
 
-        String[] instructions = {
-                "Cuidado com os espinhos!!!"
-        };
-
-        int startY = terminalSize.getRows() - 30;
-        for (int i = 0; i < instructions.length; i++) {
-            String line = instructions[i];
-            int x = (terminalSize.getColumns() - line.length()) / 2;
-            graphics.putString(x, startY + i, line);
+        for (Platform platform : platforms) {
+            for (int x = platform.getStartX(); x <= platform.getEndX(); x++) {
+                screen.setCharacter(x, platform.getY(),
+                        new TextCharacter('#', TextColor.ANSI.GREEN, TextColor.ANSI.BLACK));
+            }
         }
     }
     private void showFallMessage(Screen screen, TerminalSize terminalSize) throws IOException, InterruptedException {
@@ -130,18 +147,10 @@ public class Level3 {
         graphics.putString(terminalSize.getColumns() / 2 - 5, terminalSize.getRows() / 2, "You Died!");
         screen.refresh();
         Thread.sleep(2000);
-        Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
-        level3.startGame(screen, terminalSize);
+        Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows());
+        level5.startGame(screen, terminalSize);
     }
 
-    private void drawPlatform(Screen screen) {
-        TextGraphics graphics = screen.newTextGraphics();
-
-        for (int i = PLATFORM_START_X; i <= PLATFORM_END_X; i++) {
-            graphics.setForegroundColor(TextColor.ANSI.GREEN);
-            graphics.putString(i, PLATFORM_Y, "#");
-        }
-    }
     private void drawSpikes(Screen screen) {
         TextGraphics graphics = screen.newTextGraphics();
 
@@ -149,15 +158,30 @@ public class Level3 {
             graphics.setForegroundColor(TextColor.ANSI.RED);
             graphics.putString(i, 48, "w");
         }
-    }
-
-    private void startLevel4(Screen screen, TerminalSize terminalSize) {
-        Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows());
-        try {
-            level4.startGame(screen, terminalSize);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        for (int i = 60; i <=93 ; i++) {
+            graphics.setForegroundColor(TextColor.ANSI.RED);
+            graphics.putString(i, 48, "w");
         }
     }
+    private void collectCoins() {
+        for (int i = 0; i < coins.size(); i++) {
+            Coin coin = coins.get(i);
+
+            if (player.getX() == coin.getX() && player.getY() == coin.getY()-2) {
+                coins.remove(i);
+                score += 1;
+                break;
+            }
+        }
+    }
+
+//    private void startLevel4(Screen screen, TerminalSize terminalSize) {
+//        Level4 level4 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
+//        try {
+//            level4.startGame(screen, terminalSize);
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

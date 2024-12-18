@@ -46,6 +46,7 @@ public class Menu {
                         case Enter:
                             running = handleSelection();
                             screen.stopScreen();
+                            System.exit(0);
                             break;
                         case Escape:
                             screen.stopScreen();
@@ -123,8 +124,13 @@ public class Menu {
             } else if (selectedLevel == 2) {
                 Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level3.startGame(screen, terminalSize);
+            } else if (selectedLevel == 3) {
+                Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows());
+                level4.startGame(screen, terminalSize);
+            } else if (selectedLevel == 4) {
+                Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows());
+                level5.startGame(screen, terminalSize);
             }
-
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -137,13 +143,12 @@ public class Menu {
         screen.setCursorPosition(null);
         screen.clear();
 
-        String[] levels = {"Level 1", "Level 2", "Level 3"};
-        boolean choosingLevel = true;
+        String[] levels = {"Level 1", "Level 2", "Level 3", "Level 4", "Level 5"};
         int maxColumns = screen.getTerminalSize().getColumns();
         int maxRows = screen.getTerminalSize().getRows();
 
 
-        while (choosingLevel) {
+        while (true) {
             screen.clear();
             TextGraphics graphics = screen.newTextGraphics();
             graphics.setForegroundColor(TextColor.ANSI.WHITE);
@@ -178,10 +183,14 @@ public class Menu {
                         }
                         break;
                     case Enter:
-                        choosingLevel = false;
                         startGame();
                         screen.stopScreen();
+                        System.exit(0);
                         break;
+                    case Escape:
+                        selectedLevel = 0;
+                        start();
+                        System.exit(0);
                 }
             }
         }

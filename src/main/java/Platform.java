@@ -1,22 +1,28 @@
-import java.awt.*;
-
 public class Platform {
-    private int x, y, width, height;
+    private final int startX;
+    private final int endX;
+    private final int y;
 
-    public Platform(int x, int y, int width, int height) {
-        this.x = x;
+    public Platform(int startX, int endX, int y) {
+        this.startX = startX;
+        this.endX = endX;
         this.y = y;
-        this.width = width;
-        this.height = height;
     }
 
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
+    public int getStartX() {
+        return startX;
+    }
 
-    public void render(Graphics g) {
-        g.setColor(Color.GREEN);
-        g.fillRect(x, y, width, height);
+    public int getEndX() {
+        return endX;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public boolean isPlayerOnPlatform(Personagem player) {
+        return player.getY() == y - player.getSpriteHeight() &&
+                player.getX() >= startX && player.getX() <= endX;
     }
 }

@@ -18,7 +18,7 @@ public class Gravidade {
         }
         player.setY(newY);
     }
-    public void jump(Personagem player){
+    public void jump(){
             verticalVelocity = jumpStrength;
 
     }
