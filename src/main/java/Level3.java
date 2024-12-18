@@ -7,32 +7,30 @@ import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
 
-public class Level2 {
+public class Level3 {
     private final Personagem player;
     private final PlatformPhysics platformPhysics;
     private int score = 0;
     private final int doorX;
-    private final int doorY;
     private final DoorSprite doorSprite;
     private static final int PLATFORM_Y = 45;
     private static final int PLATFORM_START_X = 35;
     private static final int PLATFORM_END_X = 65;
 
-    public Level2(Screen screen, int terminalWidth, int terminalHeight) {
+    public Level3(Screen screen, int terminalWidth, int terminalHeight) {
         int groundLevel = terminalHeight - 1;
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
         doorSprite = new DoorSprite();
         doorX = terminalWidth - 6;
-        doorY = terminalHeight -4;
         platformPhysics = new PlatformPhysics(groundLevel, PLATFORM_Y, PLATFORM_START_X,PLATFORM_END_X);
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
+        boolean isPlaying = true;
 
-        while (true) {
+        while (isPlaying) {
             screen.clear();
-
             KeyStroke keyStroke = screen.pollInput();
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
@@ -57,14 +55,18 @@ public class Level2 {
             player.draw(screen);
             drawInstructions(screen, terminalSize);
             drawPlatform(screen);
+            drawSpikes(screen);
 
             // Check for door collision
-            if (player.getX() >= doorX && player.getY() == doorY) {
-                startLevel3(screen, terminalSize);
-                return;
+            if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
+                isPlaying = false;
+                showScore();
             }
 
             if (player.getX() > 40 && player.getX() < 60 && player.getY() > terminalSize.getRows()-6) {
+                showFallMessage(screen, terminalSize);
+            }
+            if (player.getX()+3 > 20 && player.getX()-1 < 23 && player.getY() > terminalSize.getRows()-6) {
                 showFallMessage(screen, terminalSize);
             }
 
@@ -106,7 +108,7 @@ public class Level2 {
         graphics.setForegroundColor(TextColor.ANSI.WHITE);
 
         String[] instructions = {
-                "Usa a seta para cima para saltares"
+                "Cuidado com os espinhos!!!"
         };
 
         int startY = terminalSize.getRows() - 30;
@@ -120,28 +122,28 @@ public class Level2 {
         screen.clear();
         TextGraphics graphics = screen.newTextGraphics();
         graphics.setForegroundColor(TextColor.ANSI.RED);
-        graphics.putString(terminalSize.getColumns() / 2 - 5, terminalSize.getRows() / 2, "You Fell!");
+        graphics.putString(terminalSize.getColumns() / 2 - 5, terminalSize.getRows() / 2, "You Died!");
         screen.refresh();
         Thread.sleep(2000);
-        Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
-        level2.startGame(screen, terminalSize);
+        Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
+        level3.startGame(screen, terminalSize);
     }
 
     private void drawPlatform(Screen screen) {
         TextGraphics graphics = screen.newTextGraphics();
 
-        // Draw the platform at the defined position
         for (int i = PLATFORM_START_X; i <= PLATFORM_END_X; i++) {
             graphics.setForegroundColor(TextColor.ANSI.GREEN);
             graphics.putString(i, PLATFORM_Y, "#");
         }
     }
-    private void startLevel3(Screen screen, TerminalSize terminalSize) {
-        Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
-        try {
-            level3.startGame(screen, terminalSize);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+    private void drawSpikes(Screen screen) {
+        TextGraphics graphics = screen.newTextGraphics();
+
+        for (int i = 20; i <=23 ; i++) {
+            graphics.setForegroundColor(TextColor.ANSI.RED);
+            graphics.putString(i, 48, "w");
         }
     }
+
 }

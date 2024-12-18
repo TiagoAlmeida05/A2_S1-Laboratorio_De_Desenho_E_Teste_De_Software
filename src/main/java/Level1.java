@@ -51,7 +51,7 @@ public class Level1 {
             player.updatePosition(terminalSize.getColumns(), terminalSize.getRows());
             gravity.updatePosition(player);
 
-            drawDoor(screen, terminalSize.getRows() - 5);  // Place the door one row above the floor
+            drawDoor(screen, terminalSize.getRows() - 5);
             drawFloor(screen, terminalSize.getColumns());
             player.draw(screen);
             drawInstructions(screen, terminalSize);

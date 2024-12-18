@@ -114,12 +114,15 @@ public class Menu {
             screen.startScreen();
             TerminalSize terminalSize = screen.getTerminalSize();
 
-            if (selectedLevel == 0) {  // Level 1
+            if (selectedLevel == 0) {
                 Level1 level1 = new Level1(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level1.startGame(screen, terminalSize);
-            } else if (selectedLevel == 1) {  // Level 2
+            } else if (selectedLevel == 1) {
                 Level2 level2 = new Level2(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level2.startGame(screen, terminalSize);
+            } else if (selectedLevel == 2) {
+                Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
+                level3.startGame(screen, terminalSize);
             }
 
         } catch (IOException | InterruptedException e) {
@@ -134,7 +137,7 @@ public class Menu {
         screen.setCursorPosition(null);
         screen.clear();
 
-        String[] levels = {"Level 1", "Level 2"};
+        String[] levels = {"Level 1", "Level 2", "Level 3"};
         boolean choosingLevel = true;
         int maxColumns = screen.getTerminalSize().getColumns();
         int maxRows = screen.getTerminalSize().getRows();
