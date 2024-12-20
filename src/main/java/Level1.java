@@ -6,6 +6,8 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Level1 {
     private final Personagem player;
@@ -13,8 +15,10 @@ public class Level1 {
     private final int doorY;
     private final int doorX;
     private final DoorSprite doorSprite;
+    private final List<Platform> platforms;
 
     public Level1(Screen screen, int terminalWidth, int terminalHeight) {
+        platforms = new ArrayList<>();
         int groundLevel = terminalHeight - 1;
         HumanSprite humanSprite = new HumanSprite();
         player = new Personagem(1, groundLevel - 1, humanSprite.getSprite());
@@ -35,7 +39,12 @@ public class Level1 {
             if (keyStroke != null) {
                 if (keyStroke.getKeyType() != null) {
                     switch (keyStroke.getKeyType()) {
-                        case ArrowUp -> gravity.jump();
+                        case ArrowUp -> {
+                            if (player.getY() == terminalSize.getRows() - player.getSpriteHeight() - 1 ||
+                                    platforms.stream().anyMatch(platform -> platform.isPlayerOnPlatform(player))) {
+                                gravity.jump();
+                            }
+                        }
                         case ArrowLeft -> player.moveLeft();
                         case ArrowRight -> player.moveRight();
                         case Escape -> System.exit(0);
