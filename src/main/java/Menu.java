@@ -66,7 +66,7 @@ public class Menu {
         graphics.setBackgroundColor(TextColor.ANSI.BLUE);
         screen.clear();
 
-        String title = "RunCollector";
+        String title = "Jumping Jack";
         graphics.setForegroundColor(TextColor.ANSI.WHITE);
         graphics.putString((screen.getTerminalSize().getColumns() - title.length()) / 2, 2, title);
 
