@@ -274,7 +274,7 @@ public class FinalLevel {
         screen.refresh();
         Thread.sleep(3000);
         screen.clear();
-        graphics.putString(terminalSize.getColumns() / 2 - 13, terminalSize.getRows() / 2, "YOU FINISHED THE GAME");
+        graphics.putString(terminalSize.getColumns() / 2 - 10, terminalSize.getRows() / 2, "YOU FINISHED THE GAME");
         screen.refresh();
         Thread.sleep(3000);
         screen.clear();
