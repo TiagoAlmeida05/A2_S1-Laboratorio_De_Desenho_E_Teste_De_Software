@@ -12,7 +12,6 @@ import java.util.List;
 public class Level2 {
     private final Personagem player;
     private final Gravidade gravidade;
-    private int score = 0;
     private final int doorX;
     private final int doorY;
     private final DoorSprite doorSprite;
@@ -89,7 +88,6 @@ public class Level2 {
             }
 
             screen.refresh();
-            score++;
             Thread.sleep(10);
         }
     }

@@ -10,7 +10,6 @@ import java.io.IOException;
 public class Level1 {
     private final Personagem player;
     private final Gravidade gravity;
-    private int score = 0;
     private final int doorY;
     private final int doorX;
     private final DoorSprite doorSprite;
@@ -62,7 +61,6 @@ public class Level1 {
             }
 
             screen.refresh();
-            score++;
             Thread.sleep(10);
         }
     }

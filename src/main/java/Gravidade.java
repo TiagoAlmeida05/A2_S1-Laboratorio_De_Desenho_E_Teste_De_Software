@@ -1,7 +1,7 @@
 public class Gravidade {
     private double verticalVelocity = 0;
-    private final double gravity = 0.1;
-    private final double jumpStrength = -1.6;
+    private final double gravity = 0.035;
+    private final double jumpStrength = -1.22;
     private final int groundLevel;
 
     public Gravidade(int groundLevel){

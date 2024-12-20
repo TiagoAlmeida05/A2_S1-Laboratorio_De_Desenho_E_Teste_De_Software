@@ -125,11 +125,26 @@ public class Menu {
                 Level3 level3 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
                 level3.startGame(screen, terminalSize);
             } else if (selectedLevel == 3) {
-                Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows());
+                Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
                 level4.startGame(screen, terminalSize);
             } else if (selectedLevel == 4) {
-                Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows());
+                Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
                 level5.startGame(screen, terminalSize);
+            } else if (selectedLevel == 5) {
+                Level6 level6 = new Level6(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
+                level6.startGame(screen, terminalSize);
+            } else if (selectedLevel == 6) {
+                Level7 level7 = new Level7(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
+                level7.startGame(screen, terminalSize);
+            } else if (selectedLevel == 7) {
+                Level8 level8 = new Level8(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
+                level8.startGame(screen, terminalSize);
+            } else if (selectedLevel == 8) {
+                Level9 level9 = new Level9(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
+                level9.startGame(screen, terminalSize);
+            }else if (selectedLevel == 9) {
+                FinalLevel finalLevel = new FinalLevel(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
+                finalLevel.startGame(screen, terminalSize);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -143,7 +158,7 @@ public class Menu {
         screen.setCursorPosition(null);
         screen.clear();
 
-        String[] levels = {"Level 1", "Level 2", "Level 3", "Level 4", "Level 5"};
+        String[] levels = {"Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Level 7", "Level 8", "Level 9", "Final Level"};
         int maxColumns = screen.getTerminalSize().getColumns();
         int maxRows = screen.getTerminalSize().getRows();
 

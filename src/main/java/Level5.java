@@ -11,7 +11,8 @@ import java.util.List;
 
 public class Level5 {
     private final Personagem player;
-    private int score = 0;
+    private int score;
+    private final int previousScore;
     private final int doorX;
     private final int doorY;
     private final DoorSprite doorSprite;
@@ -19,7 +20,9 @@ public class Level5 {
     private final List<Platform> platforms;
     private final Gravidade gravidade;
 
-    public Level5(Screen screen, int terminalWidth, int terminalHeight) {
+    public Level5(Screen screen, int terminalWidth, int terminalHeight, int initialScore) {
+        this.score = initialScore;
+        this.previousScore = initialScore;
         int groundLevel = terminalHeight - 1;
         gravidade = new Gravidade(groundLevel);
         HumanSprite humanSprite = new HumanSprite();
@@ -34,7 +37,7 @@ public class Level5 {
         coins.add(new Coin(70, 39));
         platforms = new ArrayList<>();
         platforms.add(new Platform(35, 65, 45));
-        platforms.add(new Platform(60, 95, 40));
+        platforms.add(new Platform(60, 93, 40));
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
@@ -91,11 +94,10 @@ public class Level5 {
             collectCoins();
 
 
-//            if (player.getX() >= doorX && player.getY() == doorY) {
-//                startLevel4(screen, terminalSize);
-//                return;
-//            }
-
+           if (player.getX() >= doorX && player.getY() == doorY) {
+                startLevel6(screen, terminalSize);
+                return;
+            }
             if (player.getX() > 40 && player.getX() < 60 && player.getY() > terminalSize.getRows()-6) {
                 showFallMessage(screen, terminalSize);
             }
@@ -107,7 +109,6 @@ public class Level5 {
             }
 
             screen.refresh();
-            score++;
             Thread.sleep(10);
         }
     }
@@ -149,7 +150,7 @@ public class Level5 {
         graphics.putString(terminalSize.getColumns() / 2 - 5, terminalSize.getRows() / 2, "You Died!");
         screen.refresh();
         Thread.sleep(2000);
-        Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows());
+        Level5 level5 = new Level5(screen, terminalSize.getColumns(), terminalSize.getRows(),previousScore);
         level5.startGame(screen, terminalSize);
     }
 
@@ -169,21 +170,21 @@ public class Level5 {
         for (int i = 0; i < coins.size(); i++) {
             Coin coin = coins.get(i);
 
-            if (player.getX() == coin.getX() && player.getY() == coin.getY()-2) {
+            if ((player.getX()+2 == coin.getX() || player.getX()+1 == coin.getX()||player.getX() == coin.getX())&& player.getY() == coin.getY()-2)  {
                 coins.remove(i);
-                score += 1;
+                score += 10;
                 break;
             }
         }
     }
 
-//    private void startLevel4(Screen screen, TerminalSize terminalSize) {
-//        Level4 level4 = new Level3(screen, terminalSize.getColumns(), terminalSize.getRows());
-//        try {
-//            level4.startGame(screen, terminalSize);
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void startLevel6(Screen screen, TerminalSize terminalSize) {
+        Level6 level6 = new Level6(screen, terminalSize.getColumns(), terminalSize.getRows(), score);
+        try {
+            level6.startGame(screen, terminalSize);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+   }
 
 }

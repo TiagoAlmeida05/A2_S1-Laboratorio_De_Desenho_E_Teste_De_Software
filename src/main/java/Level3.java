@@ -12,7 +12,6 @@ import java.util.List;
 public class Level3 {
     private final Personagem player;
     private final Gravidade gravidade;
-    private int score = 0;
     private final int doorX;
     private final int doorY;
     private final DoorSprite doorSprite;
@@ -31,9 +30,8 @@ public class Level3 {
     }
 
     public void startGame(Screen screen, TerminalSize terminalSize) throws InterruptedException, IOException {
-        boolean isPlaying = true;
 
-        while (isPlaying) {
+        while (true) {
             screen.clear();
             KeyStroke keyStroke = screen.pollInput();
             if (keyStroke != null) {
@@ -79,10 +77,6 @@ public class Level3 {
             drawPlatforms(screen);
             drawSpikes(screen);
 
-            if (player.getX() >= doorX && player.getX() <= doorX + 5 && player.getY() == terminalSize.getRows() - 2) {
-                isPlaying = false;
-                showScore();
-            }
             if (player.getX() >= doorX && player.getY() == doorY) {
                 startLevel4(screen, terminalSize);
                 return;
@@ -96,7 +90,6 @@ public class Level3 {
             }
 
             screen.refresh();
-            score++;
             Thread.sleep(10);
         }
     }
@@ -118,14 +111,6 @@ public class Level3 {
                 screen.setCharacter(i, screen.getTerminalSize().getRows() - 1, new TextCharacter('#', TextColor.ANSI.WHITE, TextColor.ANSI.BLACK));
             }
         }
-    }
-
-    private void showScore() {
-        System.out.println("Your final score is: " + score + " coins!");
-    }
-
-    public int getScore() {
-        return score;
     }
 
     private void drawInstructions(Screen screen, TerminalSize terminalSize) {
@@ -175,7 +160,7 @@ public class Level3 {
     }
 
     private void startLevel4(Screen screen, TerminalSize terminalSize) {
-        Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows());
+        Level4 level4 = new Level4(screen, terminalSize.getColumns(), terminalSize.getRows(), 0);
         try {
             level4.startGame(screen, terminalSize);
         } catch (IOException | InterruptedException e) {
